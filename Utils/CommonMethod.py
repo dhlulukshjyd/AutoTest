@@ -3,13 +3,27 @@ from datetime import datetime
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.common.action_chains import ActionChains
 import time
+import pymssql
 
 class CommonMethod(object):
     """description of class"""
 
-    # webdriver instance
     def __init__(self, driver):
         self.driver = driver
+
+    # 连接sql server数据库
+    def connect_db(self, host, database, user, pwd, sql_sentence):
+        conn = pymssql.connect(host=host, database=database, user=user, password=pwd)
+        cur = conn.cursor()
+        try:
+            cur.execute(sql_sentence)
+            resultdata = cur.fetchone()
+            return resultdata
+        except Exception as e:
+            print e
+        finally:
+            cur.close()
+            conn.close()
 
     # 查找元素
     def findElement(self, element):
@@ -67,7 +81,6 @@ class CommonMethod(object):
         time.sleep(2)
         alert.accept()
 
-
     # 切换iframe
     def switchframe(self, frameid):
         self.driver.switch_to.frame(frameid)
@@ -87,11 +100,11 @@ class CommonMethod(object):
         format = "%a %b %d %H:%M:%S %Y"
         return datetime.now().strftime(format)
 
-    def getCurrentDay(self):
-        format = "%Y-%m-%d %H:%M:%S"
-        return datetime.now().strftime(format)
-
     # 时间差
     def timeDiff(self, starttime, endtime):
         format = "%a %b %d %H:%M:%S %Y"
         return datetime.strptime(endtime, format) - datetime.strptime(starttime, format)
+
+
+
+
